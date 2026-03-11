@@ -2,7 +2,7 @@ import torch
 from torch_geometric.data import Data
 from rdkit import Chem
 
-def create_graph(smiles, target_value):
+def create_graph(smiles, target_value=0):
     mol = Chem.MolFromSmiles(smiles)
     if mol is None: return None
     mol = Chem.AddHs(mol)  # Add hydrogens to the molecule
@@ -18,6 +18,7 @@ def create_graph(smiles, target_value):
         features.append(feat)
         
     x = torch.tensor(features, dtype=torch.float)
+    y = torch.tensor([target_value], dtype=torch.float)
     
     rows, cols = [], []
     for bond in mol.GetBonds():
@@ -27,4 +28,4 @@ def create_graph(smiles, target_value):
     
     edge_index = torch.tensor([rows, cols], dtype=torch.long)
     
-    return Data(x=x, edge_index=edge_index, y=torch.tensor([target_value], dtype=torch.float))
+    return Data(x=x, edge_index=edge_index, y=y)
